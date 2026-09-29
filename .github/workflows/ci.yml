@@ -1,0 +1,107 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: test (go ${{ matrix.go }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # 1.22 is the language level Traefik's interpreter holds the plugin
+        # to; stable is what contributors have.
+        go: ['1.22', 'stable']
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: ${{ matrix.go }}
+          # The plugin is stdlib-only: there is no go.sum to key a cache on.
+          cache: false
+      - name: gofmt
+        if: matrix.go == 'stable'
+        run: |
+          unformatted=$(gofmt -l .)
+          if [ -n "$unformatted" ]; then echo "$unformatted"; exit 1; fi
+      - run: go vet ./...
+      - run: go test -race ./...
+
+  yaegi:
+    # The same tests, interpreted by the Yaegi that Traefik v3.3 to v3.7
+    # embed. It has quirks the compiler doesn't: see the README.
+    name: test (yaegi v0.16.1)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: stable
+          cache: false
+      - run: go run github.com/traefik/yaegi/cmd/yaegi@v0.16.1 test .
+
+  demo:
+    name: demo (traefik ${{ matrix.traefik }}, ${{ matrix.plugin }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # Every Traefik the README says is supported.
+        traefik: [v3.3, v3.4, v3.5, v3.6, v3.7]
+        plugin: [source]
+        include:
+          # The plugin laid out as Kubernetes mounts a ConfigMap, which is
+          # how the release's siding-plugin-X.Y.Z.yaml reaches Traefik.
+          - traefik: v3.5
+            plugin: configmap
+    env:
+      TRAEFIK_VERSION: ${{ matrix.traefik }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: lay the plugin out as a ConfigMap volume
+        if: matrix.plugin == 'configmap'
+        run: |
+          scripts/configmap-layout.sh "$RUNNER_TEMP/siding-plugin"
+          echo "PLUGIN_DIR=$RUNNER_TEMP/siding-plugin" >>"$GITHUB_ENV"
+      - run: docker compose up -d
+        working-directory: demo
+      - run: ./demo-test.sh
+        working-directory: demo
+      - name: traefik's log
+        if: failure()
+        run: docker compose logs traefik
+        working-directory: demo
+
+  chart:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: stable
+          cache: false
+      # helm, yq and kubectl come with the runner.
+      - name: the chart renders what the plugin accepts
+        run: scripts/chart-test.sh
+      - name: what a release would publish
+        run: |
+          scripts/release.sh 0.0.0
+          kubectl create --dry-run=client -o name -f dist/release/siding-plugin-0.0.0.yaml
+
+  repo:
+    name: formatting and tags
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - run: npx --yes prettier@3.9.9 --check .
+      - run: scripts/check-tags.sh

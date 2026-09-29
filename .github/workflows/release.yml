@@ -1,0 +1,71 @@
+name: release
+
+# One tag releases everything: the plugin (the tag itself, which Traefik's
+# catalog and the Go proxy read), the chart and the plugin's ConfigMap.
+on:
+  push:
+    tags: ['v[0-9]+.[0-9]+.[0-9]+']
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: stable
+          cache: false
+
+      - name: version
+        run: echo "VERSION=${GITHUB_REF_NAME#v}" >>"$GITHUB_ENV"
+
+      - run: scripts/check-tags.sh
+
+      - name: the tagged commit passes
+        run: |
+          go vet ./...
+          go test -race ./...
+          go run github.com/traefik/yaegi/cmd/yaegi@v0.16.1 test .
+          scripts/chart-test.sh
+
+      - name: the chart repository's index so far
+        run: |
+          if git fetch --depth 1 origin gh-pages; then
+            git show FETCH_HEAD:index.yaml >"$RUNNER_TEMP/index.yaml" || true
+          fi
+
+      - name: build
+        run: scripts/release.sh "$VERSION" "$RUNNER_TEMP/index.yaml"
+
+      # Fails if the release exists: a released version is never replaced.
+      - name: publish the release
+        run: |
+          gh release create "$GITHUB_REF_NAME" --verify-tag --generate-notes \
+            "dist/release/siding-$VERSION.tgz" \
+            "dist/release/siding-plugin-$VERSION.yaml"
+
+      - name: publish the chart repository's index
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git fetch --depth 1 origin gh-pages; then
+            git worktree add "$RUNNER_TEMP/pages" FETCH_HEAD
+            git -C "$RUNNER_TEMP/pages" switch -c gh-pages
+          else
+            git worktree add --detach "$RUNNER_TEMP/pages"
+            git -C "$RUNNER_TEMP/pages" switch --orphan gh-pages
+          fi
+          cp dist/release/index.yaml "$RUNNER_TEMP/pages/index.yaml"
+          touch "$RUNNER_TEMP/pages/.nojekyll"
+          git -C "$RUNNER_TEMP/pages" add index.yaml .nojekyll
+          git -C "$RUNNER_TEMP/pages" commit -m "chart $VERSION"
+          git -C "$RUNNER_TEMP/pages" push origin gh-pages
