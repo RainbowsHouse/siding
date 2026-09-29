@@ -1,0 +1,65 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "global": { "type": "object" },
+    "plugin": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["alias"],
+      "properties": {
+        "alias": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]*$" }
+      }
+    },
+    "namePrefix": { "type": "string", "pattern": "^([a-z0-9]([-a-z0-9]*)?)?$" },
+    "commonLabels": {
+      "type": "object",
+      "additionalProperties": { "type": "string" }
+    },
+    "commonAnnotations": {
+      "type": "object",
+      "additionalProperties": { "type": "string" }
+    },
+    "defaults": { "$ref": "#/definitions/config" },
+    "services": {
+      "type": "object",
+      "propertyNames": { "pattern": "^[a-z0-9-]{1,32}$" },
+      "additionalProperties": {
+        "oneOf": [{ "type": "null" }, { "$ref": "#/definitions/config" }]
+      }
+    }
+  },
+  "definitions": {
+    "config": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "baggageHeader": { "type": "string" },
+        "tenancyKey": { "type": "string" },
+        "overridesKey": { "type": "string" },
+        "tenancyPrefix": { "type": "string", "minLength": 1 },
+        "userHeader": { "type": "string" },
+        "registry": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "file": { "type": "string" },
+            "url": { "type": "string" },
+            "refreshInterval": { "type": ["string", "integer"] },
+            "tenancies": { "type": "object" },
+            "accounts": {
+              "type": "object",
+              "additionalProperties": { "type": "string" }
+            }
+          }
+        },
+        "allowHeaderOverrides": { "type": "boolean" },
+        "allowedHosts": { "type": "array", "items": { "type": "string" } },
+        "trustedSources": { "type": "array", "items": { "type": "string" } },
+        "injectBaggage": { "type": "boolean" },
+        "debugHeader": { "type": "string" }
+      }
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{{- range $service, $overrides := .Values.services }}
+{{- $name := printf "%s%s" $.Values.namePrefix $service }}
+{{- if gt (len $name) 63 }}
+{{- fail (printf "services.%s: the Middleware's name %q is longer than 63 characters; shorten namePrefix" $service $name) }}
+{{- end }}
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: {{ $name }}
+  namespace: {{ $.Release.Namespace }}
+  labels:
+    {{- include "siding.labels" $ | nindent 4 }}
+    siding.rainbows.house/service: {{ $service }}
+  {{- with $.Values.commonAnnotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  plugin:
+    {{ $.Values.plugin.alias }}:
+      {{- include "siding.config" (dict "root" $ "service" $service "overrides" $overrides) | nindent 6 }}
+{{- end }}

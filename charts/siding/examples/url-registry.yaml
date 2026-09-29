@@ -1,0 +1,14 @@
+# Several services reading one registry over HTTP, as they would from a
+# discovery controller.
+defaults:
+  registry:
+    url: http://registry.example.svc:8080/registry
+    refreshInterval: 5s
+  allowedHosts:
+    - '.siding-sut.svc:8080'
+services:
+  cats-openapi: {}
+  dogs-api:
+    # Behind forwardAuth, which sets this header: test accounts route
+    # without sending baggage.
+    userHeader: Remote-User

@@ -1,0 +1,14 @@
+# One service with its registry written into the Middleware: nothing to
+# poll, and no file to mount into Traefik.
+services:
+  cats-openapi:
+    registry:
+      tenancies:
+        test/pr-123:
+          services:
+            cats-openapi: http://cats-openapi.siding-sut.svc:8080
+          expiresAt: '2026-10-01T00:00:00Z'
+      accounts:
+        tester-1: test/pr-123
+    userHeader: Remote-User
+    debugHeader: X-Siding

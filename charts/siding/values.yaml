@@ -1,0 +1,32 @@
+plugin:
+  # -- The name the plugin has in Traefik's static configuration:
+  # `experimental.plugins.<alias>` or `experimental.localPlugins.<alias>`.
+  # The chart does not load the plugin into Traefik; see the README.
+  alias: siding
+
+# -- What each Middleware's name starts with: `<namePrefix><service>`.
+namePrefix: siding-
+
+# -- Labels added to every Middleware.
+commonLabels: {}
+
+# -- Annotations added to every Middleware.
+commonAnnotations: {}
+
+# -- Plugin configuration shared by every service: any key of the plugin's
+# configuration except `service`, which is the key under `services`.
+defaults: {}
+#  registry:
+#    url: http://registry.example.svc:8080/registry
+#    refreshInterval: 5s
+#  tenancyPrefix: test/
+#  allowedHosts:
+#    - '.siding-sut.svc:8080'
+
+# -- The services to guard, one Middleware each. The key is the name the
+# service has in the registry. The value is plugin configuration for that
+# service alone: a key set here replaces the one in `defaults`, whole.
+services: {}
+#  cats-openapi: {}
+#  dogs-api:
+#    userHeader: Remote-User

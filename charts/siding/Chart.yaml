@@ -1,0 +1,20 @@
+apiVersion: v2
+name: siding
+description: >-
+  Request-level test routing for Traefik: one siding Middleware for each
+  service you guard.
+type: application
+# Both are set from the git tag when a release is packaged; one version
+# covers the plugin and the chart.
+version: 0.0.0
+appVersion: 0.0.0
+home: https://github.com/rainbowshouse/siding
+sources:
+  - https://github.com/rainbowshouse/siding
+keywords:
+  - traefik
+  - middleware
+  - testing
+  - routing
+annotations:
+  artifacthub.io/license: Apache-2.0

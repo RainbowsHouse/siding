@@ -1,0 +1,18 @@
+{{- if .Values.services }}
+siding guards {{ len .Values.services }} service(s) in {{ .Release.Namespace }}:
+{{ range $service, $_ := .Values.services }}
+  {{ $.Values.namePrefix }}{{ $service }}
+{{- end }}
+
+Each is a Traefik Middleware. Nothing is routed until one is attached to a
+route, and until Traefik has the plugin loaded under the name
+"{{ .Values.plugin.alias }}": a Middleware whose plugin Traefik does not know
+costs the route it is attached to. Load the plugin first:
+
+  https://github.com/rainbowshouse/siding#install
+{{- else }}
+siding rendered nothing: `services` is empty. Name the services to guard:
+
+  services:
+    cats-openapi: {}
+{{- end }}

@@ -1,0 +1,21 @@
+# An edge that believes routing baggage only from inside the cluster, and
+# lets those requests name their own targets, bounded by host and port.
+defaults:
+  registry:
+    file: /etc/siding/registry.json
+  trustedSources:
+    - 10.42.0.0/16
+  allowHeaderOverrides: true
+  allowedHosts:
+    - '.siding-sut.svc:8080'
+    - '[fd00::10]:8080'
+services:
+  cats-openapi: {}
+  # This one is never steered by a request's own overrides, and reads a
+  # registry of its own: the key replaces the default's, whole.
+  payments:
+    allowHeaderOverrides: false
+    registry:
+      url: https://registry.example.com/payments.json
+commonLabels:
+  team: platform
