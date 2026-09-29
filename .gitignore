@@ -1,0 +1,9 @@
+# Built by scripts/ and the release workflow
+/dist/
+# Helm
+charts/*/charts/
+*.tgz
+# Editors and OS
+.DS_Store
+.idea/
+.vscode/

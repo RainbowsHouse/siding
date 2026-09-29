@@ -1,0 +1,3 @@
+# Markdown and YAML are formatted with prettier: `npx prettier --check .`
+singleQuote: true
+proseWrap: preserve

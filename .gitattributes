@@ -1,0 +1,4 @@
+# GitHub's language statistics decide whether Traefik's plugin catalog sees
+# this as a Go repository. The chart's templates are not the project's code.
+charts/** linguist-vendored
+demo/** linguist-documentation

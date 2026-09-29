@@ -1,0 +1,90 @@
+# Traefik dynamic configuration for the demo: three routers over the "prod"
+# backend, each with the siding middleware guarding it as cats-openapi,
+# configured a different way. The key under `plugin` is the alias from
+# `--experimental.localPlugins.<alias>` in docker-compose.yaml.
+http:
+  routers:
+    # Any host: the registry is a file, polled.
+    cats-openapi:
+      rule: 'PathPrefix(`/`)'
+      entryPoints:
+        - web
+      service: prod
+      middlewares:
+        - cats-openapi-router
+    # inline.localhost: the registry is in the middleware's own configuration.
+    cats-openapi-inline:
+      rule: 'Host(`inline.localhost`)'
+      entryPoints:
+        - web
+      service: prod
+      middlewares:
+        - cats-openapi-inline
+    # edge.localhost: routing baggage is accepted from trusted peers only.
+    cats-openapi-edge:
+      rule: 'Host(`edge.localhost`)'
+      entryPoints:
+        - web
+      service: prod
+      middlewares:
+        - cats-openapi-edge
+
+  services:
+    prod:
+      loadBalancer:
+        servers:
+          - url: 'http://prod:8080'
+
+  middlewares:
+    cats-openapi-router:
+      plugin:
+        siding:
+          service: cats-openapi
+          # In a cluster this would be set by forwardAuth, never trusted from
+          # the client; the demo lets curl send it.
+          userHeader: X-User-Id
+          registry:
+            file: /etc/siding/registry.json
+            refreshInterval: 2s
+          # Explicit routing-overrides baggage is trusted only for these
+          # endpoints, and with it on every entry names its port; registry
+          # targets are checked against them too.
+          allowHeaderOverrides: true
+          allowedHosts:
+            - 'sut:80'
+          # Off by default: it tells the client where the request went.
+          debugHeader: X-Siding
+
+    cats-openapi-inline:
+      plugin:
+        siding:
+          service: cats-openapi
+          userHeader: X-User-Id
+          registry:
+            tenancies:
+              test/env-1:
+                services:
+                  cats-openapi: http://sut:80
+              test/gone:
+                services:
+                  cats-openapi: http://sut:80
+                # Quoted: unquoted, YAML reads a timestamp, not a string,
+                # and Traefik then refuses this whole file.
+                expiresAt: '2020-01-01T00:00:00Z'
+            accounts:
+              tester-1: test/env-1
+          debugHeader: X-Siding
+
+    cats-openapi-edge:
+      plugin:
+        siding:
+          service: cats-openapi
+          userHeader: X-User-Id
+          registry:
+            file: /etc/siding/registry.json
+            refreshInterval: 2s
+          # TEST-NET-1: no peer in the demo is in it, so curl is an untrusted
+          # client and only the account binding can select a tenancy.
+          trustedSources:
+            - 192.0.2.0/24
+          debugHeader: X-Siding

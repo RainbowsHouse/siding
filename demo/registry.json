@@ -1,0 +1,12 @@
+{
+  "tenancies": {
+    "test/env-1": {
+      "services": {
+        "cats-openapi": "http://sut:80"
+      }
+    }
+  },
+  "accounts": {
+    "tester-1": "test/env-1"
+  }
+}

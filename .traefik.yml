@@ -1,0 +1,21 @@
+# Traefik plugin manifest. Traefik's Yaegi interpreter loads the Go source in
+# this directory; nothing is compiled.
+displayName: siding
+type: middleware
+import: github.com/rainbowshouse/siding
+basePkg: siding
+summary: >-
+  Request-level test routing, after Uber's SLATE: a request whose W3C baggage
+  carries a test tenancy is switched to the service under test registered for
+  it, and every other request goes to production untouched.
+
+# Traefik's plugin catalog builds the middleware from this, outside any
+# cluster, so it has to be a configuration New accepts: one that can route,
+# from a registry that needs no file or network.
+testData:
+  service: cats-openapi
+  registry:
+    tenancies:
+      test/pr-123:
+        services:
+          cats-openapi: http://cats-openapi.siding-sut.svc:8080
