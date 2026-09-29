@@ -90,13 +90,13 @@ jobs:
         with:
           go-version: stable
           cache: false
-      # helm, yq and kubectl come with the runner.
+      # helm, yq and jq come with the runner. Nothing here needs a cluster.
       - name: the chart renders what the plugin accepts
         run: scripts/chart-test.sh
+      - name: the plugin's ConfigMap holds the plugin
+        run: scripts/plugin-configmap-test.sh
       - name: what a release would publish
-        run: |
-          scripts/release.sh 0.0.0
-          kubectl create --dry-run=client -o name -f dist/release/siding-plugin-0.0.0.yaml
+        run: scripts/release.sh 0.0.0
 
   repo:
     name: formatting and tags

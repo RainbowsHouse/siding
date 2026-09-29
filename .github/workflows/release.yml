@@ -36,6 +36,7 @@ jobs:
           go test -race ./...
           go run github.com/traefik/yaegi/cmd/yaegi@v0.16.1 test .
           scripts/chart-test.sh
+          scripts/plugin-configmap-test.sh "$VERSION"
 
       - name: the chart repository's index so far
         run: |
