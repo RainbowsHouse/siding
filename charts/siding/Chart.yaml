@@ -8,9 +8,9 @@ type: application
 # covers the plugin and the chart.
 version: 0.0.0
 appVersion: 0.0.0
-home: https://github.com/rainbowshouse/siding
+home: https://github.com/RainbowsHouse/siding
 sources:
-  - https://github.com/rainbowshouse/siding
+  - https://github.com/RainbowsHouse/siding
 keywords:
   - traefik
   - middleware

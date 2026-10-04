@@ -105,3 +105,6 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - run: npx --yes prettier@3.9.9 --check .
       - run: scripts/check-tags.sh
+      # Traefik's catalog wants the module path spelled as GitHub spells the
+      # repository, upper case included.
+      - run: scripts/check-repo-name.sh

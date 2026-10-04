@@ -2,7 +2,7 @@
 # this directory; nothing is compiled.
 displayName: siding
 type: middleware
-import: github.com/rainbowshouse/siding
+import: github.com/RainbowsHouse/siding
 basePkg: siding
 summary: >-
   Request-level test routing, after Uber's SLATE: a request whose W3C baggage

@@ -19,14 +19,14 @@ services:
       # Yaegi reads the plugin source from ./plugins-local/src/<moduleName>
       # (relative to `/`, the image's working directory); `siding` is the
       # alias dynamic.yaml refers to.
-      - '--experimental.localPlugins.siding.moduleName=github.com/rainbowshouse/siding'
+      - '--experimental.localPlugins.siding.moduleName=github.com/RainbowsHouse/siding'
     ports:
       # Loopback only.
       - '127.0.0.1:${DEMO_PORT:-8000}:8000'
     volumes:
       # Source, not a build: Yaegi interprets the .go files of this one
       # directory (and skips the _test.go ones).
-      - '${PLUGIN_DIR:-..}:/plugins-local/src/github.com/rainbowshouse/siding:ro'
+      - '${PLUGIN_DIR:-..}:/plugins-local/src/github.com/RainbowsHouse/siding:ro'
       - './dynamic.yaml:/etc/traefik/dynamic.yaml:ro'
       # The registry is re-read every refreshInterval: edit registry.json
       # while this runs to add or repoint a tenancy.

@@ -38,6 +38,10 @@ no code with SLATE, which is not open source.
 - **Traefik v3.3 to v3.7.** Every release in that range interprets plugins
   with the same Yaegi, v0.16.1. CI runs the demo against each.
 - **Pre-1.0.** Configuration keys may still change between minor versions.
+- **`v0.1.1` is the first version the catalog can install.** `v0.1.0` spelt
+  the module path `github.com/rainbowshouse/siding`, which the catalog
+  refuses: the repository is `RainbowsHouse/siding`. Loaded locally, both
+  work.
 - **Kubernetes discovery is a design, not yet code:** see
   [docs/design/discovery.md](docs/design/discovery.md).
 
@@ -52,8 +56,8 @@ Traefik loads a plugin from its static configuration, in one of two ways.
 experimental:
   plugins:
     siding:
-      moduleName: github.com/rainbowshouse/siding
-      version: v0.1.0
+      moduleName: github.com/RainbowsHouse/siding
+      version: v0.1.1
 ```
 
 Traefik downloads the plugin from its catalog **every time it starts**. If
@@ -66,22 +70,22 @@ Each release carries `siding-plugin-X.Y.Z.yaml`: a ConfigMap of that name
 holding the plugin's source. Nothing is downloaded when Traefik starts.
 
 ```sh
-kubectl apply -n traefik -f https://github.com/rainbowshouse/siding/releases/download/v0.1.0/siding-plugin-0.1.0.yaml
+kubectl apply -n traefik -f https://github.com/RainbowsHouse/siding/releases/download/v0.1.1/siding-plugin-0.1.1.yaml
 ```
 
 ```yaml
 # values of the traefik/traefik Helm chart
 additionalArguments:
-  - '--experimental.localPlugins.siding.moduleName=github.com/rainbowshouse/siding'
+  - '--experimental.localPlugins.siding.moduleName=github.com/RainbowsHouse/siding'
 deployment:
   additionalVolumes:
     - name: siding-plugin
       configMap:
-        name: siding-plugin-0.1.0
+        name: siding-plugin-0.1.1
         optional: true
 additionalVolumeMounts:
   - name: siding-plugin
-    mountPath: /plugins-local/src/github.com/rainbowshouse/siding
+    mountPath: /plugins-local/src/github.com/RainbowsHouse/siding
 ```
 
 - **Upgrading is a change to that ConfigMap's name.** Traefik reads a

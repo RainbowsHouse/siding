@@ -9,7 +9,7 @@ route, and until Traefik has the plugin loaded under the name
 "{{ .Values.plugin.alias }}": a Middleware whose plugin Traefik does not know
 costs the route it is attached to. Load the plugin first:
 
-  https://github.com/rainbowshouse/siding#install
+  https://github.com/RainbowsHouse/siding#install
 {{- else }}
 siding rendered nothing: `services` is empty. Name the services to guard:
 

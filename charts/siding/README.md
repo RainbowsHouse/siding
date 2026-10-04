@@ -1,7 +1,7 @@
 # siding Helm chart
 
 Renders one Traefik `Middleware` for each service you guard with
-[siding](https://github.com/rainbowshouse/siding).
+[siding](https://github.com/RainbowsHouse/siding).
 
 ```sh
 helm repo add siding https://rainbowshouse.github.io/siding
@@ -13,7 +13,7 @@ helm install siding siding/siding --namespace traefik --values values.yaml
 **It does not load the plugin into Traefik.** That is Traefik's static
 configuration, which belongs to however Traefik itself is installed. Do that
 first, by either way in the
-[project README](https://github.com/rainbowshouse/siding#install): a
+[project README](https://github.com/RainbowsHouse/siding#install): a
 `Middleware` whose plugin Traefik does not know costs the route it is
 attached to.
 
@@ -45,7 +45,7 @@ Where a route also has a forwardAuth middleware, put siding after it, so that
 | `commonAnnotations` | `{}`      | Annotations added to every Middleware.                                                           |
 
 `defaults`, and the value of each entry under `services`, take the plugin's
-[configuration keys](https://github.com/rainbowshouse/siding#configuration),
+[configuration keys](https://github.com/RainbowsHouse/siding#configuration),
 except `service`.
 
 ```yaml

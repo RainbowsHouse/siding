@@ -18,7 +18,7 @@ if ! [[ $version =~ ^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]; then
   echo "version must be X.Y.Z, got '$version'" >&2
   exit 1
 fi
-repo=${GITHUB_REPOSITORY:-rainbowshouse/siding}
+repo=${GITHUB_REPOSITORY:-RainbowsHouse/siding}
 
 cd "$(dirname "$0")/.."
 rm -rf dist/release
