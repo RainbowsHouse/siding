@@ -4,6 +4,27 @@ entries:
   - annotations:
       artifacthub.io/license: Apache-2.0
     apiVersion: v2
+    appVersion: 0.1.1
+    created: "2026-10-04T22:35:58.51304365Z"
+    description: 'Request-level test routing for Traefik: one siding Middleware for
+      each service you guard.'
+    digest: e99010176ebda8c00b60ae0261f77609a1370fa19e493f7a32f4ab21cecf4b4c
+    home: https://github.com/RainbowsHouse/siding
+    keywords:
+    - traefik
+    - middleware
+    - testing
+    - routing
+    name: siding
+    sources:
+    - https://github.com/RainbowsHouse/siding
+    type: application
+    urls:
+    - https://github.com/RainbowsHouse/siding/releases/download/v0.1.1/siding-0.1.1.tgz
+    version: 0.1.1
+  - annotations:
+      artifacthub.io/license: Apache-2.0
+    apiVersion: v2
     appVersion: 0.1.0
     created: "2026-09-30T18:50:22.890755067Z"
     description: 'Request-level test routing for Traefik: one siding Middleware for
@@ -22,4 +43,4 @@ entries:
     urls:
     - https://github.com/RainbowsHouse/siding/releases/download/v0.1.0/siding-0.1.0.tgz
     version: 0.1.0
-generated: "2026-09-30T18:50:22.890448876Z"
+generated: "2026-10-04T22:35:58.512670726Z"
